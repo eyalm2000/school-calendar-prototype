@@ -1,0 +1,13 @@
+{
+  "name": "school-calendar-prototype",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
