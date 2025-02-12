@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 5858;
 
 // Endpoint to serve JSON
 app.get('/events', (req, res) => {
-  const filePath = path.join(__dirname, 'final.json');
+  const filePath = path.join(__dirname, 'final-8.json');
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) {
       console.error('Error reading the JSON file:', err);

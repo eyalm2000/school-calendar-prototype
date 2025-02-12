@@ -5,7 +5,9 @@ import os
 import time
 import requests
 import google.generativeai as genai
+from dotenv import load_dotenv
 
+load_dotenv()
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 cutoff = datetime.date(2024, 8, 31)
 ical_url="https://calendar.google.com/calendar/ical/leobaeck.net_sqm2v9h1k13gl8nps32iba34q8%40group.calendar.google.com/public/basic.ics"
@@ -18,10 +20,10 @@ def read_ical(url):
     response = requests.get(url)
     return icalendar.Calendar.from_ical(response.text)
 
-def process_events():
+def process_events(url):
     filtered_events = []
 
-    for event in read_ical(ical_url).walk('vevent'):
+    for event in read_ical(url).walk('vevent'):
         start_date = event.get('dtstart').dt
 
         if isinstance(start_date, datetime.datetime): 
@@ -41,9 +43,9 @@ def process_events():
     filtered_events = sorted(filtered_events, key=lambda x: x['start'])
     return filtered_events
 
-def update_json():
+def update_json(url, grade):
 
-    events = process_events()
+    events = process_events(url)
 
     generation_config = {
         "temperature": 0.7,
@@ -66,9 +68,9 @@ def update_json():
 
     response = chat_session.send_message(json.dumps(events, default=str, indent=4, ensure_ascii=False))
 
-    with open('final.json', 'w', encoding='utf-8') as json_file:
+    with open(f'final-{grade}.json', 'w', encoding='utf-8') as json_file:
         lines = response.text.splitlines()
-        if lines and lines[0].startswith('```json'): # todo - understand this code 
+        if lines and lines[0].startswith('```json'): 
             lines = lines[1:]
         if lines and lines[-1].strip() == '```':
             lines = lines[:-1]
@@ -78,7 +80,7 @@ def update_json():
 
 while True:
     try:
-        update_json()
+        update_json(ical_url, "8")
         print("Updated JSON")
     except Exception as e:
         print("Error: ", e)
